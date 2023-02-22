@@ -4,6 +4,6 @@
 
 result = {}                            # готовим хэш под ответ
 alphabet = ('а'..'я').to_a             # создаем массив из букв русского алфавита
-alphabet.each_with_object(result) do |vowel, hash|
-  hash[vowel] = alphabet.index(vowel) + 1 if 'аеиоуыэюя'.include?(vowel) # если буква гласная, то она добавляется в хэш
+alphabet.each_with_object(result).with_index do |(vowel, hash), ind|
+  hash[vowel] = ind + 1 if 'аеиоуыэюя'.include?(vowel) # если буква гласная, то она добавляется в хэш
 end

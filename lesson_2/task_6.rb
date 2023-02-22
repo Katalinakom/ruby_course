@@ -11,36 +11,40 @@
 # Вычислить и вывести на экран итоговую сумму всех покупок в "корзине".
 
 puts "Чтобы вывести итоговую сумму всех покупок введите 'стоп' вместо названия товара"
-shop_list = {}                                                        # все товары в хэше
-shop_cart = []                                                        # все товары в массиве
+shop_info = {}                                                        # информация о всех товарах в виде хэша
 sum_of_products = []                                                  # стоимость покупки каждого товара
-sum = 0                                                               # итого
-
-def cart_filling(name, cost_per_item, quantity)
-  purchase = { cost: 0, amount: 0 } # создаем хэш для одного товара
-  purchase[:cost] = cost_per_item.to_f
-  purchase[:amount] = quantity.to_f
-  { name => purchase }
-end
 
 loop do
-  print 'Введите название товара, цену за единицу и количество купленного товара через пробел: '
-  name, cost_per_item, quantity = gets.split # считываем данные о товарах
-  shop_cart << cart_filling(name, cost_per_item, quantity)
+  puts 'Введите название товара, цену за единицу и количество купленного товара. Каждое на отдельной строке. '
+  name = gets.chomp                                                   # считываем данные о товарах
+  cost_per_item = gets.to_f
+  quantity = gets.to_f
   break if name == 'стоп'
+
+  shop_info[name] = { cost: cost_per_item, amount: quantity } # добавляем информацию о товаре в хэш
+  # или же shop_info.fetch(:name, {cost: cost_per_item, amount: quantity})
+end
+# из каждого хэша для товара находим стоимость покупки товара и заносим его в массив
+shop_info.each do |_, val|
+  sum_of_products << val.values.reduce(&:*)
 end
 
-shop_cart = shop_cart[0...shop_cart.size - 1] # удаляем последний ненужный товар с название 'стоп';
-shop_cart.each do |x| # из каждого хэша для товара
-  sum_of_products << x.to_a.flatten[1].values.reduce(&:*) # находим стоимость покупки товара и заносим его в массив
-  sum += x.to_a.flatten[1].values.reduce(&:*) # а также добавляем в итоговую стоимость всей покупки
+puts "Хэш товаров: #{shop_info}"                                      # печатаем хэш товаров
+
+puts 'ЧЕК'.center(41, '*')                                            # печатаем чек
+order_num = 0
+shop_info.each do |title, inf|
+  puts "Название товара: #{title}"
+  puts "Цена за единицу: #{inf[:cost]}"
+  puts "Количество купленного товара: #{inf[:amount]}"
+  puts "Итоговая сумма за товар: #{sum_of_products[order_num]}"
+  # или так:
+  # puts "Название товара: #{title}".ljust(41)
+  # puts "Цена за единицу: #{inf[:cost]}".ljust(41)
+  # puts "Количество купленного товара: #{inf[:amount]}".ljust(41)
+  # puts "Итоговая сумма за товар: %d".ljust(41) % sum_of_products[order_num]
+  puts '_' * 41
+  order_num += 1
 end
-shop_cart.each_with_object(shop_list) { |cart, list| list[cart.keys[0]] = cart.values[0] }
-# формируем хэш, в котором ключ - название товара
-# а значение - стоимость за единицу и количество
-puts "Хэш товаров: #{shop_list}"                                      # печатаем хэш товаров
-puts 'Название товара | Сумма за товар'
-shop_list.each_key do |prod|
-  puts "#{prod} : #{sum_of_products[shop_list.keys.index(prod)]}"     # печатаем чек
-end
-puts "ИТОГО: #{sum}"
+
+puts "ИТОГО: #{sum_of_products.sum}"
